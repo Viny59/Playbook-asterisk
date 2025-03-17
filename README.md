@@ -29,7 +29,7 @@ Créez un fichier nommé `asterisk.yml`, qui contiendra le playbook Ansible pour
 Créez un fichier `inventory.ini` pour définir la liste des serveurs cibles. Exemple de configuration :
 ```ini
 [asterisk_servers]
-serveur_asterisk ansible_host={IP_DU_SERVEUR} ansible_user=admin ansible_ssh_private_key_file=~/.ssh/id_rsa
+{IP_DU_SERVEUR} ansible_user=admin
 ```
 Remplacez `{IP_DU_SERVEUR}` par l’adresse IP de votre serveur Asterisk.
 
@@ -46,28 +46,3 @@ Une fois le playbook terminé, connectez-vous à votre serveur et exécutez la c
 ```bash
 asterisk -vvvvc
 ```
-Cette commande permet d’ouvrir la console Asterisk en mode interactif avec un niveau de verbosité élevé.
-
-## 5. Vérification de la version d'Asterisk
-Pour vérifier la version d'Asterisk installée, utilisez l'une des commandes suivantes :
-
-### 5.1 En ligne de commande
-```bash
-asterisk -V
-```
-Cela affichera une sortie similaire à :
-```
-Asterisk 18.12.1
-```
-
-### 5.2 Depuis la console Asterisk
-Si Asterisk est en cours d'exécution, entrez dans la console en mode interactif avec :
-```bash
-asterisk -vvvvc
-```
-Puis, exécutez la commande suivante :
-```bash
-core show version
-```
-Cela affichera des informations détaillées sur la version d'Asterisk en cours d'exécution.
-
