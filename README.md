@@ -71,6 +71,3 @@ core show version
 ```
 Cela affichera des informations détaillées sur la version d'Asterisk en cours d'exécution.
 
----
-Votre serveur est maintenant configuré avec Asterisk via Ansible ! 🎉
-
