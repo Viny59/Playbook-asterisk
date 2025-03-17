@@ -1,0 +1,78 @@
+- name: Déployer et démarrer Asterisk en mode console
+  hosts: asterisk_servers
+  become: yes
+
+  tasks:
+    - name: Mettre à jour la liste des paquets et le système
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Installer les dépendances nécessaires pour Asterisk
+      apt:
+        name:
+          - build-essential
+          - wget
+          - libxml2-dev
+          - libncurses5-dev
+          - libssl-dev
+          - libnewt-dev
+          - libsqlite3-dev
+          - uuid-dev
+          - libjansson-dev
+          - libpcap-dev
+          - git
+          - gcc
+          - make
+          - curl
+          - libedit-dev  # Ajouter libedit-dev ici
+        state: present
+
+    - name: Créer le répertoire pour extraire les fichiers d'Asterisk
+      file:
+        path: /opt/asterisk_src
+        state: directory
+        mode: '0755'
+
+    - name: Télécharger Asterisk depuis le site officiel
+      get_url:
+        url: "https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz"
+        dest: /tmp/asterisk.tar.gz
+
+    - name: Extraire l'archive Asterisk avec tar
+      shell: |
+        tar --strip-components=1 -xzf /tmp/asterisk.tar.gz -C /opt/asterisk_src/
+      args:
+        executable: /bin/bash
+
+    - name: Vérifier la présence des sources d'Asterisk après extraction
+      stat:
+        path: /opt/asterisk_src/configure
+      register: config_check
+
+    - name: Télécharger PJProject manuellement
+      get_url:
+        url: https://raw.githubusercontent.com/asterisk/third-party/master/pjproject/2.14.1/pjproject-2.14.1.tar.bz2
+        dest: /tmp/pjproject-2.14.1.tar.bz2
+      register: pjproject_download
+      retries: 3
+      delay: 5
+
+    - name: Extraire PJProject
+      shell: |
+        tar -xvjf /tmp/pjproject-2.14.1.tar.bz2 -C /opt/asterisk_src/third-party/
+      args:
+        executable: /bin/bash
+      when: pjproject_download.changed
+
+    - name: Configurer Asterisk
+      shell: ./configure --with-pjproject-bundled --without-pjproject-source
+      args:
+        chdir: /opt/asterisk_src
+      register: configure_asterisk
+
+    - name: Compiler et installer Asterisk
+      shell: make && make install
+      args:
+        chdir: /opt/asterisk_src
+      when: configure_asterisk.rc == 0
