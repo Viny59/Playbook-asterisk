@@ -1,52 +1,44 @@
-Configuration et exécution d'un Playbook Ansible pour Asterisk
+# Ansible Playbook pour Déploiement Asterisk
 
-1. Configuration de la connexion SSH entre la machine Ansible et le serveur distant
+Ce playbook Ansible automatise l'installation et la configuration d'Asterisk.
 
-Avant d'exécuter le playbook Ansible, il est nécessaire de configurer une connexion SSH entre la machine de contrôle Ansible et le serveur distant.
+## Description
 
-1.1 Générer une clé SSH sur la machine Ansible
+Le playbook installe Asterisk, incluant les dépendances et la configuration de base.
 
-Exécutez la commande suivante pour générer une paire de clés SSH :
+## Prérequis
 
-ssh-keygen
+*   Ansible installé.
+*   Accès SSH avec sudo.
+*   Connexion Internet.
 
-Appuyez sur Entrée pour accepter l’emplacement par défaut et laissez le champ de passphrase vide si vous souhaitez une connexion sans mot de passe.
+## Inventaire
 
-1.2 Copier la clé SSH vers le serveur distant
+Configurez votre fichier `inventory` avec l'ip du serveur cible.
 
-Utilisez la commande suivante pour copier la clé publique sur le serveur distant :
+## Utilisation
 
-ssh-copy-id admin@{IP_DU_SERVEUR}
+1.  **Créez le fichier du playbook (si nécessaire) :** Si vous n'avez pas déjà le fichier `asterisk_playbook.yml`, créez-le avec `nano`  :
 
-Remplacez {IP_DU_SERVEUR} par l’adresse IP de votre serveur cible. Une fois cette étape réalisée, vous devriez pouvoir vous connecter sans mot de passe avec la commande :
+    ```
+    nano asterisk_playbook.yml
+    ```
 
-ssh admin@{IP_DU_SERVEUR}
+    Copiez-collez le contenu du playbook dans ce fichier et enregistrez-le.
 
-2. Création des fichiers nécessaires
+3.  **Modifiez l'inventaire :** Assurez-vous que le fichier `inventory` contient les informations correctes pour votre serveur cible.
 
-2.1 Création du fichier asterisk.yml
+4.  **Exécutez le playbook :**
 
-Créez un fichier nommé asterisk.yml, qui contiendra le playbook Ansible pour l'installation et la mise à jour d'Asterisk.
+    ```
+    ansible-playbook -i inventory asterisk_playbook.yml
+    ```
 
-2.2 Création du fichier inventory.ini
 
-Créez un fichier inventory.ini pour définir la liste des serveurs cibles. Exemple de configuration :
+    Après l'exécution du playbook, connectez-vous a la machine cible via SSH et exécutez :
 
-[asterisk_servers]
-serveur_asterisk ansible_host={IP_DU_SERVEUR} ansible_user=admin ansible_ssh_private_key_file=~/.ssh/id_rsa
+        ```
+        asterisk -vvvvc
+        ```
 
-Remplacez {IP_DU_SERVEUR} par l’adresse IP de votre serveur Asterisk.
-
-3. Exécution du Playbook Ansible
-
-Pour exécuter le playbook et installer ou mettre à jour Asterisk, utilisez la commande suivante :
-
-ansible-playbook -i inventory.ini asterisk.yml
-
-Cela exécutera le playbook sur le serveur défini dans inventory.ini.
-
-4. Vérification de l'installation d'Asterisk
-
-Une fois le playbook terminé, connectez-vous à votre serveur et exécutez la commande suivante pour vérifier le bon fonctionnement d'Asterisk :
-
-asterisk -vvvvc
+        
